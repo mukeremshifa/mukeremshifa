@@ -1,0 +1,62 @@
+{
+  "languages": [
+    [
+      "TypeScript",
+      962447
+    ],
+    [
+      "JavaScript",
+      439986
+    ],
+    [
+      "Python",
+      80684
+    ],
+    [
+      "PLpgSQL",
+      67742
+    ],
+    [
+      "HTML",
+      57068
+    ],
+    [
+      "CSS",
+      20614
+    ],
+    [
+      "Java",
+      17697
+    ],
+    [
+      "SCSS",
+      14248
+    ],
+    [
+      "Dockerfile",
+      722
+    ]
+  ],
+  "trajectory": {
+    "2024": {
+      "Java": 17697
+    },
+    "2025": {
+      "TypeScript": 635061,
+      "JavaScript": 247941,
+      "PLpgSQL": 24999,
+      "HTML": 16943,
+      "SCSS": 14248,
+      "CSS": 12264
+    },
+    "2026": {
+      "TypeScript": 327386,
+      "JavaScript": 192045,
+      "Python": 80684,
+      "PLpgSQL": 42743,
+      "HTML": 40125,
+      "CSS": 8350,
+      "Dockerfile": 722
+    }
+  }
+}

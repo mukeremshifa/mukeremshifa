@@ -1,86 +1,35 @@
-# Hi, I’m Mukerem 👋
+<!--
+  Every section on this page is an SVG in assets/, because GitHub strips <style>
+  tags and style attributes from README HTML and there is no other way to hold a
+  layout together here. Regenerate them with:
 
+      python tools/make_portrait.py     # photo  -> ASCII portrait
+      python tools/build_assets.py      # data   -> section artwork
 
+  The portrait below is the same one drawn at the top of the page.
+-->
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?size=28&duration=3500&color=9CA3AF&center=true&vCenter=true&width=700&lines=Hi+I'm+Mukerem;Full+Stack+Developer;React+%7C+TypeScript+%7C+Python;Building+clean+and+fast+web+apps" />
-</p>
+<img src="assets/hero.svg" width="880" alt="ASCII portrait of Mukerem Shifa beside a terminal reading: whoami, Mukerem Shifa, full-stack developer, AI applications. Building ConverseKit and SynapseDeck.">
 
----
+<img src="assets/about.svg" width="880" alt="About: I like the problems that hide behind the demo. Anyone can call an LLM API. The work is everything around it: deciding which passage is worth retrieving, keeping one client's documents out of another client's answers, and holding a conversation together when the stream drops halfway through a sentence. I am early in my career and I learn by shipping whole systems rather than tutorials. The four projects below are deployed, tested and documented. Open to junior and entry-level roles.">
 
-## 👨‍💻 About
+<img src="assets/label-work.svg" width="880" alt="Selected work: four projects, all deployed or tested">
 
-Full-stack developer focused on building **fast, clean, and scalable web applications**.
+<a href="https://conversekit-widget.pages.dev/"><img src="assets/card-conversekit.svg" width="880" alt="ConverseKit, live. Multi-tenant AI chat that installs with one script tag. Answers from each client's own documents, eleven LLM vendors behind one interface, tenants isolated by row-level security rather than by application code. TypeScript, Cloudflare Workers, Supabase, pgvector, Hono."></a>
 
-* ⚡ Stack: React, TypeScript, Node, Hono
-* 🧠 Interested in system design & performance
-* 🛠 Love building modern developer tools
+<a href="https://synapsedeck.vercel.app/"><img src="assets/card-synapsedeck.svg" width="880" alt="SynapseDeck, live. Notes in, flashcards out, reviewed on a real FSRS scheduler. Cards stream in as the model writes them and pass a review gate before entering a deck. Every figure on the progress page is counted from an append-only log. React 19, TypeScript, Supabase, Edge Functions, ts-fsrs."></a>
 
----
+<a href="https://github.com/mukeremshifa/ibm-capstone-rag-bot"><img src="assets/card-ragbot.svg" width="880" alt="Document RAG QA Bot, capstone. Question answering grounded in uploaded PDFs: chunking, embedding, vector retrieval and generation that cites what it read. Built as the capstone for IBM's AI engineering coursework. Python, LangChain, Gemini, ChromaDB."></a>
 
-## ⚡ Tech Stack
+<a href="https://github.com/mukeremshifa/little-lemon-api"><img src="assets/card-littlelemon.svg" width="880" alt="Little Lemon API, capstone. Restaurant back end covering all 21 acceptance criteria of the Meta capstone: role-based permissions across four user groups, cart and order flows, throttling, and 24 acceptance tests. Python, Django, Django REST Framework."></a>
 
-### Frontend
+<img src="assets/stack.svg" width="880" alt="Stack. Languages: TypeScript, Python, JavaScript, SQL, Java. Frontend: React 19, Vite, Tailwind, TanStack Query, Zod. Backend: Node, Hono, Django REST, Cloudflare Workers. Data: PostgreSQL, Supabase, pgvector, row-level security. AI: LangChain, OpenAI, Anthropic, Gemini, Groq, RAG. Tooling: Vitest, GitHub Actions, Git, Linux, Docker.">
 
-<p>
-<img src="https://skillicons.dev/icons?i=react,ts,js,tailwind" />
-</p>
+<img src="assets/languages.svg" width="880" alt="Languages across public repositories, 1,661,208 bytes total: TypeScript 57.9 percent, JavaScript 26.5 percent, Python 4.9 percent, PLpgSQL 4.1 percent, HTML 3.4 percent, CSS 1.2 percent, Java 1.1 percent, SCSS 0.9 percent. Trajectory by repository creation year: 2024 all Java, 2025 mostly TypeScript, 2026 TypeScript with Python appearing.">
 
-### Backend
+<img src="assets/label-contact.svg" width="880" alt="Contact">
 
-<p>
-<img src="https://skillicons.dev/icons?i=nodejs,python" />
-</p>
-
-### Database
-
-<p>
-<img src="https://skillicons.dev/icons?i=postgres" />
-</p>
-
-### Tools
-
-<p>
-<img src="https://skillicons.dev/icons?i=git,linux,vscode" />
-</p>
-
----
-
-## 📊 GitHub Stats
-
-<p align="center">
-<img src="https://github-readme-stats.vercel.app/api?username=mukeremshifa&show_icons=true&hide_border=true&theme=transparent"/>
-</p>
-
-<p align="center">
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=mukeremshifa&layout=compact&hide_border=true&theme=transparent"/>
-</p>
-
----
-
-## 📈 Activity Graph
-
-<p align="center">
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=mukeremshifa&theme=github-compact&hide_border=true"/>
-</p>
-
----
-
-## 🐍 Contributions
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/mukeremshifa/mukeremshifa/output/snake.svg" />
-</p>
-
----
-
-## 🌐 Connect
-
-<p align="center">
-<a href="https://github.com/mukeremshifa">GitHub</a>
-</p>
-
-<p align="center">
-<img src="https://komarev.com/ghpvc/?username=mukeremshifa&color=grey&style=flat" />
-</p>
-
+<a href="mailto:mukeemoha@gmail.com"><img src="assets/contact-email.svg" alt="Email mukeemoha@gmail.com"></a>
+<a href="https://www.linkedin.com/in/mukeremshifa"><img src="assets/contact-linkedin.svg" alt="LinkedIn, mukeremshifa"></a>
+<a href="https://mukeremshifa.com"><img src="assets/contact-site.svg" alt="mukeremshifa.com"></a>
+<a href="https://github.com/mukeremshifa"><img src="assets/contact-github.svg" alt="GitHub, mukeremshifa"></a>
