@@ -13,6 +13,10 @@ from __future__ import annotations
 
 import json
 import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from brand import SIGNATURE_ASPECT, SIGNATURE_PATHS, SIGNATURE_VIEWBOX  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
@@ -20,15 +24,24 @@ W = 880
 
 # ---------------------------------------------------------------- design tokens
 
-INK0 = "#121110"   # deepest ground
-INK1 = "#191714"   # card ground
-INK2 = "#221F1B"   # raised chip
-LINE = "#302B24"
-GOLD = "#EEBA2B"   # taken from the avatar, and already in ConverseKit's badge
-GOLD_D = "#8B7128"
-TEXT = "#F4F1E8"
-MUTED = "#9C9483"
-FAINT = "#6B6558"
+# Every value below is the portfolio's dark-theme token of the same role, from
+# app/globals.css. The README is a dark document, so it takes the dark palette.
+
+INK0 = "#161109"   # deepest ground   -- dark --canvas
+INK1 = "#1b1813"   # card ground      -- dark --surface
+INK2 = "#2a2722"   # raised chip      -- dark --surface-alt
+LINE = "#34312c"   #                  -- dark --border-subtle
+TEXT = "#f3ece2"   #                  -- dark --text
+MUTED = "#a3988c"  #                  -- dark --text-muted
+FAINT = "#7a7168"  #                  -- dark --border-strong
+
+BRAND = "#52b788"   # portfolio dark --brand. NOT #184e38: that is the
+                    # light-theme value and is invisible on this ground.
+BRAND_D = "#317453" # dimmed brand, for eyebrows and hairline strokes. Derived,
+                    # not quoted: the site has no dimmed-emerald token because it
+                    # never needs one. Sits between --brand-soft and --brand,
+                    # and clears 3:1 on INK1 (3.16:1).
+BRAND_SOFT = "#172a21"  # dark --brand-soft
 
 MONO = ("ui-monospace,'SF Mono','Cascadia Mono','DejaVu Sans Mono',"
         "'Segoe UI Mono',Menlo,Consolas,monospace")
@@ -64,53 +77,24 @@ def label(x, y, s, size=10.5, fill=FAINT, spacing=".18em", weight="400"):
 
 # ---------------------------------------------------------------------- 1. hero
 
-TONE = ["#7C6027", "#9A7A2B", "#B4902E", "#CDA231", "#E4B843", "#F8D473"]
-
-
-def hero(portrait: str, tones: str) -> None:
-    rows = portrait.split("\n")
-    trows = tones.split("\n")
-    cols = max(len(r) for r in rows)
-    fs, lh = 10.1, 10.7
-    art_w = 440.0
-    art_x, art_y = 40, 56
-
-    # colour is what carries tone here, so consecutive cells sharing a band
-    # become one tspan rather than one per character
-    art = []
-    for i, r in enumerate(rows):
-        r = r.ljust(cols)
-        t = trows[i].ljust(cols) if i < len(trows) else " " * cols
-        spans, run, band = [], "", None
-        for ch, b in zip(r, t):
-            b = b if ch != " " else band
-            if b != band and run:
-                spans.append((band, run)); run = ""
-            band = b
-            run += ch
-        if run:
-            spans.append((band, run))
-        inner = "".join(
-            f'<tspan fill="{TONE[int(b)] if b and b != " " else TONE[0]}" '
-            f'xml:space="preserve">{esc(s)}</tspan>' for b, s in spans)
-        art.append(
-            f'<text x="{art_x}" y="{art_y + i*lh:.1f}" font-size="{fs}" '
-            f'textLength="{art_w}" lengthAdjust="spacingAndGlyphs" '
-            f'xml:space="preserve">{inner}</text>'
-        )
-    art_h = len(rows) * lh
+def hero() -> None:
+    # left column: the portfolio's signature mark, as outlines rather than text
+    sig_x, sig_w = 40, 440
+    sig_h = sig_w / SIGNATURE_ASPECT
 
     # terminal transcript, typed line by line
     cx = 524
     seq = [
         ("cmd", "whoami"),
         ("out", "Mukerem Shifa"),
-        ("dim", "Full-stack developer, AI applications"),
+        ("dim", "AI Engineer and Full-stack Developer"),
         ("gap", ""),
         ("cmd", "cat now.txt"),
         ("out", "Building ConverseKit and SynapseDeck."),
         ("dim", "Learning how to evaluate retrieval"),
         ("dim", "instead of eyeballing it."),
+        ("gap", ""),
+        ("dim", "// powered by coffee"),
     ]
 
     lines, css, t = [], [], 0.6
@@ -121,7 +105,7 @@ def hero(portrait: str, tones: str) -> None:
             continue
         i = len(lines)
         if kind == "cmd":
-            body = (f'<tspan fill="{GOLD}">$</tspan> '
+            body = (f'<tspan fill="{BRAND}">$</tspan> '
                     f'<tspan fill="{TEXT}">{esc(txt)}</tspan>')
             n = len(txt) + 2
         else:
@@ -142,7 +126,7 @@ def hero(portrait: str, tones: str) -> None:
         t += dur + (0.28 if kind == "cmd" else 0.12)
         y += 21
 
-    cursor = (f'<rect x="{cx}" y="{y-11}" width="7.5" height="14" fill="{GOLD}" '
+    cursor = (f'<rect x="{cx}" y="{y-11}" width="7.5" height="14" fill="{BRAND}" '
               f'class="cur" opacity="0"/>')
     css.append(f".cur{{animation:blink 1.05s steps(1) {t:.2f}s infinite}}"
                "@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}")
@@ -150,21 +134,23 @@ def hero(portrait: str, tones: str) -> None:
                "[class^='r']{width:330px!important;animation:none!important}"
                ".cur{opacity:1;animation:none}}")
 
-    h = int(max(art_y + art_h, y) + 46)
-    defs = (
-        '<defs>'
-        f'<linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">'
-        f'<stop offset="0" stop-color="#F3C956"/>'
-        f'<stop offset=".55" stop-color="{GOLD}"/>'
-        f'<stop offset="1" stop-color="#C08F27"/></linearGradient>'
-        '</defs>'
+    # the transcript is now the tallest element: the composition rebalances from
+    # side-by-side to a short banner, and the signature centres against it
+    h = int(y + 46)
+    sig_y = (h - sig_h) / 2
+    sig = (
+        f'<svg x="{sig_x}" y="{sig_y:.1f}" width="{sig_w}" height="{sig_h:.0f}" '
+        f'viewBox="{SIGNATURE_VIEWBOX}" preserveAspectRatio="xMinYMid meet">'
+        f'<g fill="{TEXT}">'
+        + "".join(f'<path d="{d}"/>' for d in SIGNATURE_PATHS)
+        + '</g></svg>'
     )
     body = (
-        defs
+        sig
         + label(cx, 74, "MUKEREM SHIFA", size=15, fill=TEXT, spacing=".26em", weight="600")
-        + label(cx, 95, "ADDIS ABABA  /  BUILDING AI PRODUCTS END TO END", size=9.5)
+        + label(cx, 95, "RAS AL-KHAIMAH, UAE  /  BUILDING AI PRODUCTS END TO END", size=9.5)
         + f'<line x1="{cx}" y1="108" x2="{W-44}" y2="108" stroke="{LINE}"/>'
-        + "".join(art) + "".join(lines) + cursor
+        + "".join(lines) + cursor
     )
     write("hero.svg", svg(W, h, body, "".join(css)))
 
@@ -183,11 +169,11 @@ def about() -> None:
         ("txt",  "answers, and holding a conversation together when the"),
         ("txt",  "stream drops halfway through a sentence."),
         ("gap",  ""),
-        ("txt",  "I am early in my career and I learn by shipping whole"),
-        ("txt",  "systems rather than tutorials. The four projects below"),
+        ("txt",  "I learn by shipping whole systems rather than tutorials."),
+        ("txt",  "The three projects below"),
         ("key",  "are deployed, tested and documented."),
         ("gap",  ""),
-        ("dim",  "// open to junior and entry-level roles"),
+        ("dim",  "// open to engineering roles and selected contract work"),
     ]
     x, y, lh = 96, 62, 21.5
     out, n = [], 0
@@ -198,14 +184,14 @@ def about() -> None:
         if kind == "gap":
             y += 11
             continue
-        fill = {"txt": TEXT, "dim": FAINT, "key": GOLD}[kind]
+        fill = {"txt": TEXT, "dim": FAINT, "key": BRAND}[kind]
         out.append(f'<text x="{x}" y="{y}" font-size="13.5" fill="{fill}">'
                    f'{esc(txt)}</text>')
         y += lh
     h = int(y + 24)
     body = (
         f'<rect x="70" y="20" width="1" height="{h-40}" fill="{LINE}"/>'
-        + label(96, 36, "ABOUT", size=10, fill=GOLD_D)
+        + label(96, 36, "ABOUT", size=10, fill=BRAND_D)
         + "".join(out)
     )
     write("about.svg", svg(W, h, body))
@@ -223,7 +209,7 @@ def stack() -> None:
         ("TOOLING",   ["Vitest", "GitHub Actions", "Git", "Linux", "Docker"]),
     ]
     x0, y = 44, 56
-    out = [label(x0, 34, "STACK", size=10, fill=GOLD_D)]
+    out = [label(x0, 34, "STACK", size=10, fill=BRAND_D)]
     for gi, (name, items) in enumerate(groups):
         out.append(f'<text x="{x0}" y="{y+13}" font-size="10" fill="{FAINT}" '
                    f'letter-spacing=".16em">{esc(name)}</text>')
@@ -233,11 +219,11 @@ def stack() -> None:
             if cx + w > W - 44:
                 cx = x0 + 150
                 y += 30
-            tint = GOLD if gi in (0, 4) else MUTED
-            fill = "#241F14" if gi in (0, 4) else INK2
+            tint = BRAND if gi in (0, 4) else MUTED
+            fill = BRAND_SOFT if gi in (0, 4) else INK2
             out.append(
                 f'<rect x="{cx}" y="{y}" width="{w:.0f}" height="24" rx="4" '
-                f'fill="{fill}" stroke="{GOLD_D if gi in (0,4) else LINE}" '
+                f'fill="{fill}" stroke="{BRAND_D if gi in (0,4) else LINE}" '
                 f'stroke-opacity="{".55" if gi in (0,4) else "1"}"/>'
                 f'<text x="{cx + w/2:.0f}" y="{y+16}" font-size="11.5" '
                 f'fill="{tint}" text-anchor="middle">{esc(it)}</text>'
@@ -254,14 +240,15 @@ def languages(langs: list[tuple[str, int]], traj: dict) -> None:
     colw = (W - 44*2 - 56) / 2
     lx, rx = 44, 44 + colw + 56
     out = [
-        label(lx, 34, "LANGUAGES", size=10, fill=GOLD_D),
-        label(rx, 34, "TRAJECTORY", size=10, fill=GOLD_D),
+        label(lx, 34, "LANGUAGES", size=10, fill=BRAND_D),
+        label(rx, 34, "TRAJECTORY", size=10, fill=BRAND_D),
         f'<line x1="{rx-28}" y1="20" x2="{rx-28}" y2="290" stroke="{LINE}"/>',
     ]
 
     # left: one thin bar per language
     y = 62
-    ramp = [GOLD, "#D5A62D", "#B98F2C", "#9C7829", "#7F6226", "#654E22", "#4E3D1F", "#3B2F1B"]
+    ramp = [BRAND, "#47a077", "#3d8a66", "#337457",
+            "#2a5f47", "#224b38", "#1a3829", "#13261c"]
     for i, (name, v) in enumerate(langs[:8]):
         pct = 100 * v / total
         out.append(f'<text x="{lx}" y="{y}" font-size="11.5" fill="{TEXT if i<2 else MUTED}">'
@@ -282,8 +269,9 @@ def languages(langs: list[tuple[str, int]], traj: dict) -> None:
     base, top = 262, 66
     bx = rx + 14
     keys = ["TypeScript", "JavaScript", "Python", "PLpgSQL", "Java"]
-    kc = {"TypeScript": GOLD, "JavaScript": "#C29430", "Python": "#987231",
-          "PLpgSQL": "#7A5C2E", "Java": "#5E4A2A"}
+    kc = {"TypeScript": BRAND,     "JavaScript": "#3d8a66",
+          "Python":     "#2f6f52", "PLpgSQL":    "#24543e",
+          "Java":       "#1a3c2c"}
     for yr in years:
         d = traj[yr]
         tot = sum(d.values())
@@ -343,7 +331,7 @@ def card(slug: str, name: str, blurb: list[str], stack_items: list[str],
 # -------------------------------------------------------------------- 6. contact
 
 def section(slug: str, text: str, note: str = "") -> None:
-    body = label(44, 30, text, size=10, fill=GOLD_D)
+    body = label(44, 30, text, size=10, fill=BRAND_D)
     if note:
         body += (f'<text x="{W-44}" y="30" font-size="10" fill="{FAINT}" '
                  f'letter-spacing=".1em" text-anchor="end">{esc(note)}</text>')
@@ -355,7 +343,7 @@ def contact() -> None:
                        ("linkedin", "LINKEDIN"), ("site", "WEBSITE")]:
         w, h = len(text) * 8.4 + 46, 38
         body = (
-            f'<circle cx="20" cy="{h/2}" r="3.5" fill="{GOLD}"/>'
+            f'<circle cx="20" cy="{h/2}" r="3.5" fill="{BRAND}"/>'
             f'<text x="34" y="{h/2+4}" font-size="11" fill="{TEXT}" '
             f'letter-spacing=".16em">{esc(text)}</text>'
         )
@@ -364,7 +352,7 @@ def contact() -> None:
             f'viewBox="0 0 {w:.0f} {h}" font-family="{MONO}" role="img">'
             f'<rect width="{w:.0f}" height="{h}" rx="6" fill="{INK1}"/>'
             f'<rect x=".5" y=".5" width="{w-1:.0f}" height="{h-1}" rx="5.5" '
-            f'fill="none" stroke="{GOLD_D}" stroke-opacity=".5"/>{body}</svg>'
+            f'fill="none" stroke="{BRAND_D}" stroke-opacity=".5"/>{body}</svg>'
         )
         write(f"contact-{slug}.svg", markup)
 
@@ -373,44 +361,37 @@ def contact() -> None:
 
 def main() -> None:
     data = json.loads((ROOT / "data.json").read_text(encoding="utf-8"))
-    portrait = (ROOT / "assets" / "portrait.txt").read_text(encoding="utf-8").rstrip("\n")
-    tones = (ROOT / "assets" / "portrait-tone.txt").read_text(encoding="utf-8").rstrip("\n")
 
     print("building assets:")
-    hero(portrait, tones)
+    hero()
     about()
-    section("work", "SELECTED WORK", "FOUR PROJECTS, ALL DEPLOYED OR TESTED")
+    section("work", "SELECTED WORK", "THREE PROJECTS, TWO LIVE")
     section("contact", "CONTACT")
     stack()
     languages([(k, v) for k, v in data["languages"]], data["trajectory"])
 
+    # The set is the portfolio's three featured projects, in the site's order.
+    # Anything shown here must exist in the portfolio's content/projects/.
     card("conversekit", "ConverseKit",
          ["Multi-tenant AI chat that installs with one script tag. Answers from each",
           "client's own documents, eleven LLM vendors behind one interface, tenants",
           "isolated by row-level security rather than by application code."],
          ["TypeScript", "Cloudflare Workers", "Supabase", "pgvector", "Hono"],
-         "#EEBA2B", "LIVE")
+         BRAND, "LIVE")
 
     card("synapsedeck", "SynapseDeck",
          ["Notes in, flashcards out, reviewed on a real FSRS scheduler. Cards stream",
           "in as the model writes them and pass a review gate before entering a deck.",
           "Every figure on the progress page is counted from an append-only log."],
          ["React 19", "TypeScript", "Supabase", "Edge Functions", "ts-fsrs"],
-         "#C8F14D", "LIVE")
+         BRAND, "LIVE")
 
-    card("ragbot", "Document RAG QA Bot",
-         ["Question answering grounded in uploaded PDFs: chunking, embedding, vector",
-          "retrieval and generation that cites what it read. Built as the capstone",
-          "for IBM's AI engineering coursework."],
-         ["Python", "LangChain", "Gemini", "ChromaDB"],
-         "#4589FF", "CAPSTONE")
-
-    card("littlelemon", "Little Lemon API",
-         ["Restaurant back end covering all 21 acceptance criteria of the Meta",
-          "capstone: role-based permissions across four user groups, cart and order",
-          "flows, throttling, and 24 acceptance tests."],
-         ["Python", "Django", "Django REST Framework"],
-         "#44B78B", "CAPSTONE")
+    card("surveyquest", "Survey Quest",
+         ["A React prototype that turns a questionnaire into a light game loop:",
+          "XP, levels, badges and a confetti finish. Progress is awarded for",
+          "participation only, so the survey data stays honest."],
+         ["React", "TypeScript", "Vite"],
+         BRAND, "PROTOTYPE")
 
     contact()
     print("done.")
